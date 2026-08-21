@@ -4,7 +4,7 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
-local SERVER_URL = "http://localhost:5000/get-script"
+local SERVER_URL = "http://172.16.1.191:5000/get-script"
 local httpRequest = (syn and syn.request) or (http and http.request) or http_request or request
 
 if PlayerGui:FindFirstChild("KeySystemLoaderGui") then

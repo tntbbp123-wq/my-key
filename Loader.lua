@@ -4,9 +4,13 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
--- 소문자 local 사용
 local SERVER_URL = "http://127.0.0.1:5000/get-script"
 local httpRequest = (syn and syn.request) or (http and http.request) or http_request or request
+
+if not httpRequest then
+    warn("❌ 사용 중인 실행기가 HTTP Request 요청을 지원하지 않습니다.")
+    return
+end
 
 if PlayerGui:FindFirstChild("KeySystemLoaderGui") then
     PlayerGui.KeySystemLoaderGui:Destroy()
@@ -81,16 +85,31 @@ local function verifyKey()
     statusLabel.TextColor3 = Color3.fromRGB(200, 200, 100)
     statusLabel.Text = "서버에서 키를 확인하는 중입니다..."
 
-    local response = httpRequest({
-        Url = SERVER_URL,
-        Method = "POST",
-        Headers = {["Content-Type"] = "application/json"},
-        Body = HttpService:JSONEncode({ key = userKey })
-    })
+    local success, response = pcall(function()
+        return httpRequest({
+            Url = SERVER_URL,
+            Method = "POST",
+            Headers = {["Content-Type"] = "application/json"},
+            Body = HttpService:JSONEncode({ key = userKey })
+        })
+    end)
 
-    if response and response.StatusCode == 200 then
-        local data = HttpService:JSONEncode(response.Body)
-        if data.status == "success" and data.code then
+    if not success or not response then
+        statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+        statusLabel.Text = "❌ 서버 요청 실패 (서버가 열려있는지 확인하세요)"
+        warn("HTTP Request Error:", response)
+        return
+    end
+
+    print("Response Status Code:", response.StatusCode)
+    print("Response Body:", response.Body)
+
+    if response.StatusCode == 200 then
+        local decodeSuccess, data = pcall(function()
+            return HttpService:JSONDecode(response.Body)
+        end)
+
+        if decodeSuccess and data and data.status == "success" and data.code then
             statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
             statusLabel.Text = "✅ 인증 성공! 스크립트를 불러옵니다..."
             task.wait(0.5)
@@ -100,12 +119,16 @@ local function verifyKey()
                 screenGui:Destroy()
                 runScript()
             else
-                statusLabel.Text = "❌ 구문 오류: " .. tostring(err)
+                statusLabel.Text = "❌ 구문 오류 발생"
+                warn("Script Load Error:", err)
             end
+        else
+            statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+            statusLabel.Text = "❌ 서버 응답 파싱 실패"
         end
     else
         statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
-        statusLabel.Text = "❌ 올바르지 않은 키이거나 서버 연결에 실패했습니다."
+        statusLabel.Text = "❌ 잘못된 키이거나 서버 오류 (" .. tostring(response.StatusCode) .. ")"
     end
 end
 

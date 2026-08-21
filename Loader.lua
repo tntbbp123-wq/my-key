@@ -5,7 +5,7 @@ local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
 -- 모바일 호환을 위해 localhost 및 127.0.0.1 자동 백업 설정
-local PRIMARY_URL = "http://localhost:5000/get-script"
+local PRIMARY_URL = "http://172.30.1.92:5000/get-script"
 local SECONDARY_URL = "http://127.0.0.1:5000/get-script"
 
 local httpRequest = (syn and syn.request) or (http and http.request) or http_request or request

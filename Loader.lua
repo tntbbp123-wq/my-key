@@ -4,8 +4,8 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
--- [수정됨] Termux 내부 IP 주소 반영
-local SERVER_URL = "http://172.16.1.191:5000/get-script"
+-- 📱 단일 스마트폰 환경 전용 로컬 주소
+local SERVER_URL = "http://127.0.0.1:5000/get-script"
 local httpRequest = (syn and syn.request) or (http and http.request) or http_request or request
 
 if PlayerGui:FindFirstChild("KeySystemLoaderGui") then
@@ -23,7 +23,7 @@ mainFrame.Position = UDim2.new(0.5, -160, 0.5, -105)
 mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
 mainFrame.Active = true
 mainFrame.Draggable = true
-mainFrame.Parent = screenGui
+mainFrame.Parent = mainFrame.Parent and mainFrame.Parent:FindFirstChild("KeySystemLoaderGui") or screenGui
 
 local frameCorner = Instance.new("UICorner")
 frameCorner.CornerRadius = UDim.new(0, 10)

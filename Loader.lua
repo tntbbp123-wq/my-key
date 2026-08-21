@@ -4,7 +4,7 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
--- 📱 단일 스마트폰 환경 전용 로컬 주소
+-- 소문자 local 사용
 local SERVER_URL = "http://127.0.0.1:5000/get-script"
 local httpRequest = (syn and syn.request) or (http and http.request) or http_request or request
 
@@ -23,7 +23,7 @@ mainFrame.Position = UDim2.new(0.5, -160, 0.5, -105)
 mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 30)
 mainFrame.Active = true
 mainFrame.Draggable = true
-mainFrame.Parent = mainFrame.Parent and mainFrame.Parent:FindFirstChild("KeySystemLoaderGui") or screenGui
+mainFrame.Parent = screenGui
 
 local frameCorner = Instance.new("UICorner")
 frameCorner.CornerRadius = UDim.new(0, 10)
@@ -89,7 +89,7 @@ local function verifyKey()
     })
 
     if response and response.StatusCode == 200 then
-        local data = HttpService:JSONDecode(response.Body)
+        local data = HttpService:JSONEncode(response.Body)
         if data.status == "success" and data.code then
             statusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
             statusLabel.Text = "✅ 인증 성공! 스크립트를 불러옵니다..."
